@@ -1,4 +1,5 @@
 # cuda wrappers using ctypes
+# This is a standalone module
 
 import re
 from ctypes import *
