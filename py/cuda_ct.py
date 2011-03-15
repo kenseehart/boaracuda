@@ -3,14 +3,28 @@
 
 import re
 from ctypes import *
+from ctypes.util import find_library
+import os
+import sys
 
-# CUDA run time DLL (TODO: think of a better way to select the right DLL)
-for i in range(7,30):
-    try:
-        cu = getattr(windll, "cudart32_32_%d"%i)
-        break
-    except WindowsError:
-        continue
+
+if os.name == "nt":
+    # CUDA run time DLL (TODO: think of a better way to select the right DLL)
+    for i in range(7,30):
+        try:
+            cu = getattr(windll, "cudart32_32_%d"%i)
+            break
+        except WindowsError:
+            continue
+elif os.name == "posix":
+    # assumes DYLD_LIBRARY_PATH or LD_LIBRARY_PATH is set up
+    lib_name = "cudart"
+    lib_path = find_library(lib_name)
+    if lib_path is None: raise Exception("Unable to find Cuda RT library")
+    cu = CDLL(lib_path)
+else:
+    raise Exception("Platform not supported")
+
 
 c_size_t = c_uint32
 c_cuda_p = c_void_p
